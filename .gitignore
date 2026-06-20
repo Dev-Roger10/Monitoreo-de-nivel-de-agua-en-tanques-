@@ -2,4 +2,3 @@
 __pycache__/
 *.pyc
 datos/dataset.csv
-.claude/
