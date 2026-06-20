@@ -1,0 +1,915 @@
+:root {
+    /* Estado Rebose — azul (tanque demasiado lleno, riesgo de derrame) */
+    --rebose-color:       #60a5fa;
+    --rebose-glow:        rgba(96, 165, 250, 0.35);
+    --rebose-bg:          rgba(59, 130, 246, 0.08);
+    --rebose-badge-bg:    rgba(59, 130, 246, 0.15);
+    --rebose-badge-text:  #93c5fd;
+    --rebose-border:      rgba(59, 130, 246, 0.40);
+
+    /* Estado Normal — verde */
+    --normal-color:        #34d399;
+    --normal-glow:         rgba(52, 211, 153, 0.35);
+    --normal-bg:           rgba(52, 211, 153, 0.08);
+    --normal-badge-bg:     rgba(52, 211, 153, 0.15);
+    --normal-badge-text:   #6ee7b7;
+    --normal-border:       rgba(52, 211, 153, 0.40);
+
+    /* Estado Precaución — ámbar */
+    --precaucion-color:       #fbbf24;
+    --precaucion-glow:        rgba(251, 191, 36, 0.35);
+    --precaucion-bg:          rgba(251, 191, 36, 0.08);
+    --precaucion-badge-bg:    rgba(251, 191, 36, 0.15);
+    --precaucion-badge-text:  #fde68a;
+    --precaucion-border:      rgba(251, 191, 36, 0.40);
+
+    /* Estado Crítico — rojo */
+    --critico-color:       #f87171;
+    --critico-glow:        rgba(248, 113, 113, 0.35);
+    --critico-bg:          rgba(248, 113, 113, 0.08);
+    --critico-badge-bg:    rgba(248, 113, 113, 0.15);
+    --critico-badge-text:  #fca5a5;
+    --critico-border:      rgba(248, 113, 113, 0.40);
+
+    /* Paleta base */
+    --fondo-pagina:        #060b18;
+    --fondo-tarjeta:       rgba(15, 23, 42, 0.70);
+    --fondo-tarjeta-hover: rgba(20, 31, 55, 0.85);
+    --glass-border:        rgba(255, 255, 255, 0.07);
+    --glass-border-hover:  rgba(255, 255, 255, 0.13);
+    --texto-primario:      #f0f4ff;
+    --texto-secundario:    #7d8fb3;
+    --texto-terciario:     #4a5780;
+
+    /* Radios y espaciado */
+    --radio-lg:    20px;
+    --radio-md:    14px;
+    --radio-pill:  999px;
+    --sombra-card: 0 8px 32px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255,255,255,0.04) inset;
+    --sombra-glow: 0 0 40px;
+    --transicion:  0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ─── Reset y base ──────────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--fondo-pagina);
+    color: var(--texto-primario);
+    min-height: 100vh;
+    padding: 32px 16px 48px;
+    line-height: 1.6;
+    /* Fondo con gradiente radial y malla sutil */
+    background-image:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(56, 189, 248, 0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(52, 211, 153, 0.08) 0%, transparent 55%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ─── Contenedor principal ──────────────────────────────────────────────── */
+.container {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ─── Tarjeta base (glassmorphism) ─────────────────────────────────────── */
+.glass {
+    background: var(--fondo-tarjeta);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* ─── Encabezado ────────────────────────────────────────────────────────── */
+.header {
+    background: linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(23,35,60,0.80) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 32px;
+
+    /* Línea superior decorativa */
+    border-top: 1px solid rgba(56, 189, 248, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Destello de color en la esquina superior del header */
+.header::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.header-icon {
+    font-size: 2.8rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(56,189,248,0.5));
+    animation: flotar 3s ease-in-out infinite;
+}
+
+@keyframes flotar {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-5px); }
+}
+
+.header-texto h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #e0f2ff 0%, #93c5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-texto .subtitulo {
+    font-size: 0.83rem;
+    color: var(--texto-secundario);
+    margin-top: 3px;
+    letter-spacing: 0.01em;
+}
+
+/* Badge del estado principal */
+.estado-badge {
+    margin-left: auto;
+    padding: 9px 24px;
+    border-radius: var(--radio-pill);
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: 1px solid var(--normal-border);
+    background: var(--normal-badge-bg);
+    color: var(--normal-badge-text);
+    box-shadow: 0 0 20px var(--normal-glow), 0 0 0 1px var(--normal-border) inset;
+    transition: all var(--transicion);
+    flex-shrink: 0;
+}
+
+.estado-badge.precaucion {
+    border-color: var(--precaucion-border);
+    background: var(--precaucion-badge-bg);
+    color: var(--precaucion-badge-text);
+    box-shadow: 0 0 20px var(--precaucion-glow), 0 0 0 1px var(--precaucion-border) inset;
+}
+
+.estado-badge.critico {
+    border-color: var(--critico-border);
+    background: var(--critico-badge-bg);
+    color: var(--critico-badge-text);
+    box-shadow: 0 0 20px var(--critico-glow), 0 0 0 1px var(--critico-border) inset;
+    animation: pulsar-critico 1.2s ease-in-out infinite;
+}
+
+@keyframes pulsar-critico {
+    0%, 100% { box-shadow: 0 0 20px var(--critico-glow), 0 0 0 1px var(--critico-border) inset; }
+    50%       { box-shadow: 0 0 38px var(--critico-glow), 0 0 0 1px var(--critico-border) inset; transform: scale(1.04); }
+}
+
+/* ─── Grid de tarjetas ──────────────────────────────────────────────────── */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    background: linear-gradient(145deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: border-color var(--transicion), box-shadow var(--transicion), transform 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Degradado decorativo en la esquina de cada tarjeta */
+.card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    transition: opacity var(--transicion);
+}
+
+.card:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--sombra-card), 0 0 0 1px rgba(255,255,255,0.06);
+    transform: translateY(-4px) scale(1.005);
+}
+
+.card:hover::after {
+    opacity: 2;
+}
+
+.card-icono {
+    font-size: 2.2rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+}
+
+.card:hover .card-icono {
+    transform: scale(1.12) rotate(-4deg);
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.card-etiqueta {
+    font-size: 0.70rem;
+    color: var(--texto-terciario);
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    font-weight: 700;
+}
+
+.card-valor {
+    font-size: 1.95rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--texto-primario);
+    letter-spacing: -0.03em;
+    transition: color var(--transicion), text-shadow var(--transicion);
+}
+
+.card-valor.hora {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-unidad {
+    font-size: 0.76rem;
+    color: var(--texto-secundario);
+    margin-top: 1px;
+}
+
+/* Colores dinámicos aplicados a los valores */
+.color-normal {
+    color: var(--normal-color) !important;
+    text-shadow: 0 0 20px var(--normal-glow);
+}
+.color-precaucion {
+    color: var(--precaucion-color) !important;
+    text-shadow: 0 0 20px var(--precaucion-glow);
+}
+.color-critico {
+    color: var(--critico-color) !important;
+    text-shadow: 0 0 20px var(--critico-glow);
+}
+
+/* ─── Sección de barra de progreso ─────────────────────────────────────── */
+.seccion-progreso {
+    background: linear-gradient(145deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 26px 30px;
+}
+
+.progreso-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--texto-secundario);
+    letter-spacing: 0.02em;
+}
+
+.progreso-encabezado span:last-child {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--texto-primario);
+    font-variant-numeric: tabular-nums;
+}
+
+.progreso-contenedor {
+    background: rgba(6, 11, 24, 0.80);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radio-pill);
+    height: 22px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progreso-barra {
+    height: 100%;
+    border-radius: var(--radio-pill);
+    background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+    background-size: 200% 100%;
+    animation: gradiente-movil 3s linear infinite;
+    transition: width 0.70s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.70s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 16px rgba(52,211,153,0.40);
+}
+
+/* Gradiente animado que recorre la barra */
+@keyframes gradiente-movil {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* Brillo deslizante */
+.progreso-barra::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -80%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+    animation: brillo 2s ease-in-out infinite;
+}
+
+@keyframes brillo {
+    from { left: -80%; }
+    to   { left: 140%; }
+}
+
+.progreso-marcas {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    color: var(--texto-terciario);
+    letter-spacing: 0.02em;
+}
+
+/* ─── Sección del gráfico ───────────────────────────────────────────────── */
+.seccion-grafico {
+    background: linear-gradient(145deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 26px 30px;
+}
+
+.seccion-titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 22px;
+    color: var(--texto-secundario);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.01em;
+}
+
+.grafico-contenedor {
+    position: relative;
+    height: 290px;
+}
+
+/* ─── Panel de estado detallado ─────────────────────────────────────────── */
+.seccion-estado {
+    background: linear-gradient(135deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border: 1px solid var(--normal-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card), 0 0 30px var(--normal-glow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 22px 30px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    transition: border-color var(--transicion), box-shadow var(--transicion);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Orbe de color en el fondo del panel de estado */
+.seccion-estado::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, var(--normal-bg) 0%, transparent 70%);
+    pointer-events: none;
+    transition: background var(--transicion);
+}
+
+.seccion-estado.precaucion {
+    border-color: var(--precaucion-border);
+    box-shadow: var(--sombra-card), 0 0 30px var(--precaucion-glow);
+}
+.seccion-estado.precaucion::before {
+    background: radial-gradient(circle, var(--precaucion-bg) 0%, transparent 70%);
+}
+
+.seccion-estado.critico {
+    border-color: var(--critico-border);
+    box-shadow: var(--sombra-card), 0 0 30px var(--critico-glow);
+}
+.seccion-estado.critico::before {
+    background: radial-gradient(circle, var(--critico-bg) 0%, transparent 70%);
+}
+
+.estado-icono {
+    font-size: 2.8rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+    z-index: 1;
+}
+
+.estado-info {
+    z-index: 1;
+}
+
+.estado-info h3 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+}
+
+.estado-info p {
+    color: var(--texto-secundario);
+    font-size: 0.88rem;
+}
+
+/* ─── Colores de iconos Font Awesome ───────────────────────────────────── */
+.header-icon i { color: #38bdf8; font-size: inherit; }
+
+.card-icono i          { color: #38bdf8; font-size: inherit; }
+.icono-calor i         { color: #f97316; }   /* naranja para temperatura máx */
+.icono-frio  i         { color: #38bdf8; }   /* cian para temperatura mín */
+
+.seccion-titulo i { color: #38bdf8; }
+
+.estado-icono i { color: var(--normal-color); font-size: inherit; }
+.seccion-estado.precaucion .estado-icono i { color: var(--precaucion-color); }
+.seccion-estado.critico    .estado-icono i { color: var(--critico-color); }
+
+/* ─── Panel de info ESP32 ───────────────────────────────────────────────── */
+.esp32-panel {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.esp32-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.80rem;
+    color: var(--texto-secundario);
+    white-space: nowrap;
+}
+
+.esp32-item i {
+    color: #38bdf8;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.esp32-code {
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.76rem;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.10);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid rgba(56, 189, 248, 0.20);
+}
+
+.temp-valor { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ─── Sección de dataset ────────────────────────────────────────────────── */
+.seccion-dataset {
+    background: linear-gradient(145deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 26px 30px;
+}
+
+.dataset-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.dataset-encabezado .seccion-titulo { margin-bottom: 0; }
+
+.dataset-filtros {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filtro-btn {
+    padding: 5px 14px;
+    border-radius: var(--radio-pill);
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--texto-secundario);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s ease;
+}
+
+.filtro-btn:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+}
+
+.filtro-btn.activo {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.5);
+    color: #38bdf8;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+    margin-top: 16px;
+    border-radius: var(--radio-md);
+}
+
+.dataset-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.dataset-tabla th {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--texto-terciario);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.dataset-tabla td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--texto-secundario);
+    white-space: nowrap;
+}
+
+.dataset-tabla tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--texto-primario);
+}
+
+.estado-tag {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: var(--radio-pill);
+    font-size: 0.70rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.estado-tag.normal    { background: var(--normal-badge-bg);    color: var(--normal-badge-text); }
+.estado-tag.precaucion { background: var(--precaucion-badge-bg); color: var(--precaucion-badge-text); }
+.estado-tag.critico   { background: var(--critico-badge-bg);   color: var(--critico-badge-text); }
+
+.dataset-fuente {
+    margin-top: 14px;
+    font-size: 0.72rem;
+    color: var(--texto-terciario);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dataset-fuente i { color: #22c55e; }
+
+.dataset-cargando {
+    text-align: center;
+    color: var(--texto-terciario);
+    padding: 40px;
+    font-size: 0.88rem;
+}
+
+/* ─── Sección de zonas / distritos (dataset) ───────────────────────────── */
+.seccion-zonas {
+    background: linear-gradient(145deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 26px 30px;
+}
+
+.zonas-chart-h { height: 220px; margin-bottom: 22px; }
+
+.zonas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+    margin-top: 22px;
+}
+
+.zona-card {
+    background: rgba(10, 16, 36, 0.65);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radio-md);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color var(--transicion), transform 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.zona-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+}
+.zona-normal::before    { background: var(--normal-color); }
+.zona-precaucion::before { background: var(--precaucion-color); }
+.zona-critico::before   { background: var(--critico-color); }
+
+.zona-card:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-3px);
+}
+
+.zona-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.zona-nombre {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--texto-primario);
+    line-height: 1.3;
+}
+
+.zona-nivel {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    transition: color var(--transicion), text-shadow var(--transicion);
+}
+
+.zona-unit {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.zona-sub {
+    font-size: 0.75rem;
+    color: var(--texto-terciario);
+    margin-top: -4px;
+}
+
+.zona-barra-contenedor {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radio-pill);
+    height: 5px;
+    overflow: hidden;
+}
+
+.zona-barra {
+    height: 100%;
+    border-radius: var(--radio-pill);
+    transition: width 0.8s ease;
+}
+
+.zona-stats {
+    display: flex;
+    gap: 10px;
+    font-size: 0.73rem;
+    color: var(--texto-secundario);
+    flex-wrap: wrap;
+}
+
+.zona-stats i { margin-right: 2px; }
+
+.zona-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.70rem;
+    color: var(--texto-terciario);
+    margin-top: 2px;
+}
+
+/* ─── Estado Rebose (badge, panel, zona) ────────────────────────────────── */
+.estado-badge.rebose {
+    border-color: var(--rebose-border);
+    background:   var(--rebose-badge-bg);
+    color:        var(--rebose-badge-text);
+    box-shadow:   0 0 20px var(--rebose-glow), 0 0 0 1px var(--rebose-border) inset;
+    animation:    pulsar-rebose 1.2s ease-in-out infinite;
+}
+
+@keyframes pulsar-rebose {
+    0%, 100% { box-shadow: 0 0 20px var(--rebose-glow), 0 0 0 1px var(--rebose-border) inset; }
+    50%       { box-shadow: 0 0 38px var(--rebose-glow), 0 0 0 1px var(--rebose-border) inset; transform: scale(1.04); }
+}
+
+.seccion-estado.rebose {
+    border-color: var(--rebose-border);
+    box-shadow:   var(--sombra-card), 0 0 30px var(--rebose-glow);
+}
+.seccion-estado.rebose::before {
+    background: radial-gradient(circle, var(--rebose-bg) 0%, transparent 70%);
+}
+.seccion-estado.rebose .estado-icono i { color: var(--rebose-color); }
+
+.color-rebose {
+    color:       var(--rebose-color) !important;
+    text-shadow: 0 0 20px var(--rebose-glow);
+}
+
+.zona-rebose::before    { background: var(--rebose-color); }
+.estado-tag.rebose      { background: var(--rebose-badge-bg); color: var(--rebose-badge-text); }
+
+/* ─── Panel de Alertas Automáticas ──────────────────────────────────────── */
+.seccion-alertas {
+    background:            linear-gradient(145deg, rgba(17,27,53,0.85) 0%, rgba(10,18,38,0.80) 100%);
+    border:                1px solid rgba(239, 68, 68, 0.35);
+    border-top:            2px solid rgba(239, 68, 68, 0.60);
+    border-radius:         var(--radio-lg);
+    box-shadow:            var(--sombra-card), 0 0 24px rgba(239, 68, 68, 0.12);
+    backdrop-filter:       blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding:               26px 30px;
+}
+
+.alertas-lista {
+    display:        flex;
+    flex-direction: column;
+    gap:            10px;
+    margin-top:     8px;
+}
+
+.alerta-item {
+    display:       flex;
+    align-items:   center;
+    gap:           14px;
+    padding:       14px 18px;
+    border-radius: var(--radio-md);
+    font-size:     0.88rem;
+    font-weight:   600;
+    line-height:   1.4;
+}
+
+.alerta-item.alerta-critico {
+    background: rgba(239, 68, 68, 0.10);
+    border:     1px solid rgba(239, 68, 68, 0.30);
+    color:      #fca5a5;
+}
+.alerta-item.alerta-critico i {
+    color:     #ef4444;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.alerta-item.alerta-precaucion {
+    background: rgba(234, 179, 8, 0.10);
+    border:     1px solid rgba(234, 179, 8, 0.30);
+    color:      #fde68a;
+}
+.alerta-item.alerta-precaucion i {
+    color:     #eab308;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* ─── Sección Consumo por Hora del Día ─────────────────────────────────── */
+.seccion-consumo {
+    background:            linear-gradient(145deg, rgba(17,27,53,0.80) 0%, rgba(10,18,38,0.75) 100%);
+    border:                1px solid var(--glass-border);
+    border-radius:         var(--radio-lg);
+    box-shadow:            var(--sombra-card);
+    backdrop-filter:       blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding:               26px 30px;
+}
+
+/* ─── Pie de página ─────────────────────────────────────────────────────── */
+.footer {
+    text-align: center;
+    color: var(--texto-terciario);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    padding: 4px 0;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+    body { padding: 20px 12px 40px; }
+
+    .header {
+        flex-wrap: wrap;
+        padding: 20px 22px;
+    }
+
+    .estado-badge {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .seccion-progreso,
+    .seccion-grafico,
+    .seccion-estado { padding: 20px 20px; }
+
+    .progreso-marcas { display: none; }
+
+    .grafico-contenedor { height: 210px; }
+
+    .seccion-estado {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .seccion-estado::before { display: none; }
+
+    .esp32-panel {
+        margin-left: 0;
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 440px) {
+    .cards-grid { grid-template-columns: 1fr; }
+
+    .header-texto h1 { font-size: 1.15rem; }
+
+    .card-valor { font-size: 1.65rem; }
+}

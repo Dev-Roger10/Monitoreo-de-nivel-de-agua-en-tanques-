@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitor de Agua — Tanques Domiciliarios Perú</title>
+
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ── Encabezado ─────────────────────────────────────────── -->
+    <header class="header">
+        <div class="header-icon"><i class="fa-solid fa-droplet"></i></div>
+        <div class="header-texto">
+            <h1>Sistema de Monitoreo de Nivel de Agua</h1>
+            <p class="subtitulo">Tanques Domiciliarios — Viviendas Locales del Perú &middot; Sensor ESP32</p>
+        </div>
+        <div class="estado-badge" id="estadoBadge">Cargando…</div>
+    </header>
+
+    <!-- ── Tarjetas de métricas ────────────────────────────────── -->
+    <div class="cards-grid">
+
+        <div class="card">
+            <div class="card-icono"><i class="fa-solid fa-fill-drip"></i></div>
+            <div class="card-info">
+                <span class="card-etiqueta">Nivel Actual</span>
+                <span class="card-valor" id="nivelActual">—</span>
+                <span class="card-unidad">litros</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icono"><i class="fa-solid fa-chart-bar"></i></div>
+            <div class="card-info">
+                <span class="card-etiqueta">Porcentaje</span>
+                <span class="card-valor" id="porcentaje">—</span>
+                <span class="card-unidad">%</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icono"><i class="fa-solid fa-box"></i></div>
+            <div class="card-info">
+                <span class="card-etiqueta">Capacidad del Tanque</span>
+                <span class="card-valor" id="capacidadMax">—</span>
+                <span class="card-unidad">litros</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icono"><i class="fa-solid fa-clock"></i></div>
+            <div class="card-info">
+                <span class="card-etiqueta">Última Actualización</span>
+                <span class="card-valor hora" id="horaActualizacion">—</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icono"><i class="fa-solid fa-gauge"></i></div>
+            <div class="card-info">
+                <span class="card-etiqueta">Consumo Actual</span>
+                <span class="card-valor" id="consumoActual">—</span>
+                <span class="card-unidad">litros</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icono"><i class="fa-solid fa-temperature-half"></i></div>
+            <div class="card-info">
+                <span class="card-etiqueta">Temperatura</span>
+                <span class="card-valor" id="tempActual">—</span>
+                <span class="card-unidad">°C</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── Barra de nivel ──────────────────────────────────────── -->
+    <section class="seccion-progreso">
+        <div class="progreso-encabezado">
+            <span>Nivel del Tanque</span>
+            <span id="progresoLabel">0 %</span>
+        </div>
+        <div class="progreso-contenedor">
+            <div class="progreso-barra" id="progresoBarra" style="width: 0%"></div>
+        </div>
+        <div class="progreso-marcas">
+            <span>0 L</span>
+            <span>Crítico &lt;20 %</span>
+            <span>Precaución &lt;50 %</span>
+            <span>100 %</span>
+        </div>
+    </section>
+
+    <!-- ── Gráfico en tiempo real ──────────────────────────────── -->
+    <section class="seccion-grafico">
+        <h2 class="seccion-titulo"><i class="fa-solid fa-chart-line"></i> Histórico de Nivel en Tiempo Real</h2>
+        <div class="grafico-contenedor">
+            <canvas id="graficoNivel"></canvas>
+        </div>
+    </section>
+
+    <!-- ── Panel de estado + info ESP32 ───────────────────────── -->
+    <section class="seccion-estado" id="seccionEstado">
+        <div class="estado-icono" id="estadoIcono"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="estado-info">
+            <h3 id="estadoTitulo">Conectando con sensor ESP32…</h3>
+            <p  id="estadoDesc">Espere mientras se obtiene la lectura del tanque.</p>
+        </div>
+        <div class="esp32-panel">
+            <div class="esp32-item"><i class="fa-solid fa-microchip"></i><span id="esp32Id">—</span></div>
+            <div class="esp32-item"><i class="fa-solid fa-wifi"></i><span id="esp32Rssi">—</span></div>
+            <div class="esp32-item"><i class="fa-solid fa-location-dot"></i><span id="esp32Distrito">—</span></div>
+        </div>
+    </section>
+
+    <!-- ── Panel de Alertas Automáticas ─────────────────────── -->
+    <section class="seccion-alertas" id="seccionAlertas" style="display:none">
+        <h2 class="seccion-titulo"><i class="fa-solid fa-bell"></i> Alertas del Sistema</h2>
+        <div class="alertas-lista" id="alertasLista"></div>
+    </section>
+
+    <!-- ── Consumo por Hora del Día ───────────────────────────── -->
+    <section class="seccion-consumo">
+        <h2 class="seccion-titulo"><i class="fa-solid fa-droplet-slash"></i> Consumo de Agua por Hora del Día</h2>
+        <div class="grafico-contenedor">
+            <canvas id="graficoConsumo"></canvas>
+        </div>
+        <p class="dataset-fuente"><i class="fa-solid fa-chart-bar"></i> Análisis de patrones de consumo — Detección de horas con mayor desperdicio</p>
+    </section>
+
+    <!-- ── Nivel por Zona — Distritos del Perú ────────────────── -->
+    <section class="seccion-zonas">
+        <h2 class="seccion-titulo"><i class="fa-solid fa-map-location-dot"></i> Nivel de Agua por Distrito</h2>
+        <div class="grafico-contenedor zonas-chart-h">
+            <canvas id="graficoZonas"></canvas>
+        </div>
+        <div class="zonas-grid" id="zonasGrid">
+            <p class="dataset-cargando"><i class="fa-solid fa-spinner fa-spin"></i> Cargando distritos…</p>
+        </div>
+        <p class="dataset-fuente"><i class="fa-solid fa-cloud-arrow-down"></i> Fuente: Google Sheets · 150 registros</p>
+    </section>
+
+</div><!-- /container -->
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
